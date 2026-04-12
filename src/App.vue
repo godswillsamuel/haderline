@@ -1,12 +1,11 @@
 <script setup>
-import HomeView from './views/HomeView.vue'
+import Navbar from './components/Navbar.vue';
+import HeroSection from "./components/HeroSection.vue";
+import ServicesSection from "./components/ServicesSection.vue"; // ✅ lowercase
 </script>
 
 <template>
-  <HomeView />
+  <Navbar />
+  <HeroSection />
+  <ServicesSection />
 </template>
-
-<!-- JUST PLAIN FOR NOW BEFORE WE INTRODUCE ROUTER VIEW -->
-
-<!-- DO NOT KILL THER TERMINAL LEAVE IT RUNNING YOU CAN ONLY CLOSE BUT DON'T KILL
- THE X ICON IS TO CLOSE WHILE THE DELETE ICON IS TO KILLI'M GOING TO OPEN ANOTHER TERMINAL TO PUSH TO GITHUB WHILE MY LOCALHOST TERMINAL IS STILL RUNNING -->

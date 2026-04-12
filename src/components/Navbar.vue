@@ -1,463 +1,553 @@
 <template>
-  <nav class="navbar" :class="{ scrolled: isScrolled }">
-    <div class="navbar-inner">
+  <header :class="['navbar', { 'navbar--scrolled': isScrolled }]">
+    <div class="navbar__accent-line"></div>
 
+    <nav class="navbar__inner">
       <!-- Logo -->
-      <a href="/" class="logo">
-        <span class="logo-mark">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="currentColor" stroke-width="1.5" fill="none"/>
-            <polygon points="14,7 21,11 21,18 14,22 7,18 7,11" fill="currentColor" opacity="0.18"/>
-            <line x1="14" y1="2" x2="14" y2="26" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+      <a href="#" class="navbar__logo" @mouseenter="logoHover = true" @mouseleave="logoHover = false">
+        <span class="navbar__logo-mark">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <polygon class="logo-poly" points="16,2 30,10 30,22 16,30 2,22 2,10" stroke="#FF6B5B" stroke-width="2" fill="none"/>
+            <polygon class="logo-poly logo-poly--inner" points="16,8 24,13 24,19 16,24 8,19 8,13" fill="#FF6B5B" opacity="0.18"/>
+            <line x1="16" y1="2" x2="16" y2="30" stroke="#FF6B5B" stroke-width="1" opacity="0.4"/>
+            <line x1="2" y1="10" x2="30" y2="22" stroke="#FF6B5B" stroke-width="1" opacity="0.4"/>
+            <line x1="30" y1="10" x2="2" y2="22" stroke="#FF6B5B" stroke-width="1" opacity="0.4"/>
           </svg>
         </span>
-        <span class="logo-text">HARDELIN</span>
+        <span class="navbar__logo-text">
+          <span class="navbar__logo-name">Harderlin</span>
+          <span class="navbar__logo-sub">Investment Group</span>
+        </span>
       </a>
 
-      <!-- Desktop Links -->
-      <ul class="nav-links" :class="{ open: menuOpen }">
-        <li v-for="(item, i) in navItems" :key="i" class="nav-item">
+      <!-- Desktop Nav Links -->
+      <ul class="navbar__links">
+        <li
+          v-for="(item, i) in navItems"
+          :key="item.label"
+          class="navbar__link-item"
+          :style="`--i: ${i}`"
+        >
           <a
             :href="item.href"
-            class="nav-link"
-            :class="{ active: activeItem === item.label }"
+            class="navbar__link"
+            :class="{ 'navbar__link--active': activeLink === item.label }"
             @click="setActive(item.label)"
           >
-            {{ item.label }}
-            <span class="underline-bar"></span>
+            <!-- Split each letter for the character-swap effect -->
+            <span class="navbar__link-inner" aria-hidden="true">
+              <span
+                v-for="(char, ci) in item.label.split('')"
+                :key="ci"
+                class="navbar__link-char"
+                :style="`--ci: ${ci}`"
+              >{{ char }}</span>
+            </span>
+            <!-- Accessible real text hidden visually -->
+            <span class="navbar__link-real">{{ item.label }}</span>
           </a>
-          <!-- Dropdown -->
-          <div v-if="item.children" class="dropdown">
-            <a
-              v-for="(child, j) in item.children"
-              :key="j"
-              :href="child.href"
-              class="dropdown-item"
-            >
-              <span class="dropdown-icon">{{ child.icon }}</span>
-              <span class="dropdown-text">
-                <span class="dropdown-title">{{ child.label }}</span>
-                <span class="dropdown-desc">{{ child.desc }}</span>
-              </span>
-            </a>
-          </div>
         </li>
       </ul>
 
-      <!-- Right Actions -->
-      <div class="nav-actions">
-        <a href="/login" class="btn-ghost">Log in</a>
-        <a href="/signup" class="btn-primary">
-          <span>Open Account</span>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <!-- CTA Button -->
+      <div class="navbar__actions">
+        <a href="#" class="navbar__cta">
+          <span class="navbar__cta-label">Get Started</span>
+          <span class="navbar__cta-arrow">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </a>
       </div>
 
       <!-- Mobile Hamburger -->
-      <button class="hamburger" @click="toggleMenu" :class="{ active: menuOpen }" aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
+      <button class="navbar__hamburger" @click="toggleMenu" :aria-expanded="menuOpen" aria-label="Toggle menu">
+        <span class="navbar__bar" :class="{ 'navbar__bar--top-open': menuOpen }"></span>
+        <span class="navbar__bar" :class="{ 'navbar__bar--mid-open': menuOpen }"></span>
+        <span class="navbar__bar" :class="{ 'navbar__bar--bot-open': menuOpen }"></span>
       </button>
-
-    </div>
+    </nav>
 
     <!-- Mobile Menu -->
-    <transition name="mobile-slide">
-      <div v-if="menuOpen" class="mobile-menu">
-        <a
-          v-for="(item, i) in navItems"
-          :key="i"
-          :href="item.href"
-          class="mobile-link"
-          @click="menuOpen = false"
-        >{{ item.label }}</a>
-        <div class="mobile-divider"></div>
-        <a href="/login" class="mobile-link subtle">Log in</a>
-        <a href="/signup" class="mobile-cta">Open Account →</a>
+    <transition name="mobile-menu">
+      <div v-if="menuOpen" class="navbar__mobile-menu">
+        <ul class="navbar__mobile-links">
+          <li
+            v-for="(item, i) in navItems"
+            :key="item.label"
+            class="navbar__mobile-item"
+            :style="`--delay: ${0.08 * (i + 1)}s`"
+          >
+            <a :href="item.href" class="navbar__mobile-link" @click="menuOpen = false">
+              <span class="navbar__mobile-num">0{{ i + 1 }}</span>
+              {{ item.label }}
+            </a>
+          </li>
+        </ul>
+        <a href="#" class="navbar__mobile-cta" @click="menuOpen = false">Get Started →</a>
+        <div class="navbar__mobile-deco"></div>
       </div>
     </transition>
-  </nav>
+  </header>
 </template>
 
-<script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-
-const isScrolled = ref(false)
-const menuOpen = ref(false)
-const activeItem = ref('Markets')
-
-const navItems = [
-  {
-    label: 'Markets',
-    href: '/markets',
-    children: [
-      { label: 'Equities', desc: 'Global stock markets', href: '/markets/equities', icon: '📈' },
-      { label: 'Fixed Income', desc: 'Bonds & treasuries', href: '/markets/bonds', icon: '🏦' },
-      { label: 'Commodities', desc: 'Gold, oil, and more', href: '/markets/commodities', icon: '🛢️' },
-      { label: 'Forex', desc: 'Currency exchange', href: '/markets/forex', icon: '💱' },
-    ]
+<script>
+export default {
+  name: 'Navbar',
+  data() {
+    return {
+      isScrolled: false,
+      menuOpen: false,
+      logoHover: false,
+      activeLink: 'Home',
+      navItems: [
+        { label: 'Home',     href: '#home' },
+        { label: 'About',    href: '#about' },
+        { label: 'Services', href: '#services' },
+        { label: 'Insights', href: '#insights' },
+        { label: 'Contact',  href: '#contact' },
+      ],
+    };
   },
-  {
-    label: 'Portfolio',
-    href: '/portfolio',
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll);
   },
-  {
-    label: 'Research',
-    href: '/research',
-    children: [
-      { label: 'Insights', desc: 'Market commentary', href: '/research/insights', icon: '💡' },
-      { label: 'Reports', desc: 'Deep-dive analyses', href: '/research/reports', icon: '📄' },
-      { label: 'Forecasts', desc: 'Forward-looking data', href: '/research/forecasts', icon: '🔭' },
-    ]
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
   },
-  {
-    label: 'Solutions',
-    href: '/solutions',
+  methods: {
+    handleScroll() {
+      this.isScrolled = window.scrollY > 40;
+    },
+    toggleMenu() {
+      this.menuOpen = !this.menuOpen;
+    },
+    setActive(label) {
+      this.activeLink = label;
+    },
   },
-  {
-    label: 'About',
-    href: '/about',
-  },
-]
-
-const setActive = (label) => {
-  activeItem.value = label
-  menuOpen.value = false
-}
-
-const toggleMenu = () => {
-  menuOpen.value = !menuOpen.value
-}
-
-const handleScroll = () => {
-  isScrolled.value = window.scrollY > 20
-}
-
-onMounted(() => window.addEventListener('scroll', handleScroll))
-onUnmounted(() => window.removeEventListener('scroll', handleScroll))
+};
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
 
-:root {
-  --ink: #0d0e12;
-  --parchment: #f5f2ed;
-  --gold: #b8933f;
-  --gold-light: #d4aa5f;
-  --muted: #6b6860;
-  --border: rgba(184, 147, 63, 0.2);
-  --glass: rgba(245, 242, 237, 0.92);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
+/* ─── Navbar Shell ──────────────────────────────── */
 .navbar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  font-family: 'DM Sans', sans-serif;
-  transition: background 0.4s ease, box-shadow 0.4s ease, padding 0.3s ease;
+  top: 0; left: 0; right: 0;
+  z-index: var(--z-nav);
+  font-family: var(--font-body);
   background: transparent;
-  padding: 0 2rem;
+  transition: background 0.45s var(--ease), box-shadow 0.45s var(--ease);
 }
 
-.navbar.scrolled {
-  background: var(--glass);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  box-shadow: 0 1px 0 var(--border), 0 8px 32px rgba(13, 14, 18, 0.08);
+.navbar--scrolled {
+  background: rgba(17, 17, 17, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 1px 0 rgba(255, 107, 91, 0.12),
+              0 12px 40px rgba(0, 0, 0, 0.35);
 }
 
-.navbar-inner {
-  max-width: 1280px;
+/* ─── Accent Line ───────────────────────────────── */
+.navbar__accent-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #FF6B5B 40%, #FF9A8B 60%, transparent);
+  background-size: 200% 100%;
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: lineIn 0.9s 0.3s var(--ease) forwards,
+             shimmer 4s 1.2s ease-in-out infinite;
+}
+
+@keyframes lineIn  { to { transform: scaleX(1); } }
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ─── Inner ─────────────────────────────────────── */
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--max-width);
   margin: 0 auto;
-  height: 72px;
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
+  padding: 0 40px;
+  height: var(--nav-height);
+  transition: height 0.35s var(--ease);
+  gap: 24px;
 }
 
-/* ─── Logo ─── */
-.logo {
+.navbar--scrolled .navbar__inner {
+  height: 60px;
+}
+
+/* ─── Logo ──────────────────────────────────────── */
+.navbar__logo {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 12px;
   text-decoration: none;
   flex-shrink: 0;
+  animation: fadeSlideDown 0.7s 0.1s var(--ease) both;
 }
 
-.logo-mark {
-  color: var(--gold);
+.navbar__logo-mark svg {
+  transition: transform 0.5s var(--ease);
+}
+.navbar__logo:hover .navbar__logo-mark svg {
+  transform: rotate(30deg) scale(1.08);
+}
+
+.logo-poly {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  animation: drawPoly 1.2s ease-out forwards;
+}
+.logo-poly--inner {
+  opacity: 0;
+  animation: fadeInPoly 0.6s 0.9s ease forwards;
+}
+
+@keyframes drawPoly   { to { stroke-dashoffset: 0; } }
+@keyframes fadeInPoly { to { opacity: 0.18; } }
+
+.navbar__logo-text {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  line-height: 1;
 }
-
-.logo-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.35rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  color: var(--ink);
-}
-
-/* ─── Nav Links ─── */
-.nav-links {
-  display: flex;
-  list-style: none;
-  align-items: center;
-  gap: 0.25rem;
-  margin-left: auto;
-}
-
-.nav-item {
-  position: relative;
-}
-
-.nav-link {
-  display: block;
-  padding: 0.5rem 0.85rem;
-  font-size: 0.835rem;
-  font-weight: 400;
+.navbar__logo-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.45rem;
   letter-spacing: 0.04em;
-  color: var(--ink);
-  text-decoration: none;
+  color: var(--white);
+  text-transform: uppercase;
+}
+.navbar__logo-sub {
+  font-size: 0.58rem;
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  color: var(--coral);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ─── Nav Links — Character Lift Effect ─────────── */
+/*
+  On hover, each letter translates upward and fades out
+  while a coral-coloured clone lifts in from below.
+  Achieved with a CSS-only split-char technique using
+  custom property --ci (char index) for stagger timing.
+*/
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  list-style: none;
+}
+
+.navbar__link-item {
+  animation: fadeSlideDown 0.6s calc(0.15s + var(--i) * 0.07s) var(--ease) both;
+}
+
+.navbar__link {
   position: relative;
-  transition: color 0.2s ease;
+  display: inline-block;
+  padding: 8px 14px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  overflow: hidden;
+  /* Hide the real text — it's only for accessibility */
 }
 
-.nav-link .underline-bar {
+/* Real label: visually hidden, keeps layout width */
+.navbar__link-real {
+  visibility: hidden;
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Char container: absolutely stacked over the link */
+.navbar__link-inner {
   position: absolute;
-  bottom: 2px;
-  left: 0.85rem;
-  right: 0.85rem;
-  height: 1px;
-  background: var(--gold);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s ease;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  gap: 0;
 }
 
-.nav-link:hover,
-.nav-link.active {
-  color: var(--gold);
+.navbar__link-char {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.65);
+  transition:
+    transform 0.28s calc(var(--ci) * 0.018s) var(--ease),
+    color     0.28s calc(var(--ci) * 0.018s) var(--ease),
+    opacity   0.28s calc(var(--ci) * 0.018s) var(--ease);
+  will-change: transform;
+  white-space: pre; /* preserve spaces */
 }
 
-.nav-link:hover .underline-bar,
-.nav-link.active .underline-bar {
-  transform: scaleX(1);
+/* Active state: full white, no motion needed */
+.navbar__link--active .navbar__link-char {
+  color: var(--white);
 }
 
-/* ─── Dropdown ─── */
-.dropdown {
+/* Active indicator: thin coral tick below the word */
+.navbar__link--active::after {
+  content: '';
   position: absolute;
-  top: calc(100% + 12px);
+  bottom: 5px;
   left: 50%;
   transform: translateX(-50%);
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.6rem;
-  min-width: 240px;
-  box-shadow: 0 16px 48px rgba(13, 14, 18, 0.12);
+  width: 16px;
+  height: 2px;
+  background: var(--coral);
+  border-radius: 2px;
+  transition: width 0.3s var(--ease);
+}
+
+/* Hover: chars lift up and turn coral, staggered */
+.navbar__link:hover .navbar__link-char {
+  color: var(--coral);
+  transform: translateY(-3px);
+}
+
+/* ─── CTA — Bordered Split Button ───────────────── */
+/*
+  Clean border button. On hover the border colour
+  intensifies and the arrow slides right — no fill sweep.
+*/
+.navbar__actions {
+  flex-shrink: 0;
+  animation: fadeSlideDown 0.7s 0.55s var(--ease) both;
+}
+
+.navbar__cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 107, 91, 0.45);
+  border-radius: var(--radius-sm);
+  transition:
+    color        0.28s var(--ease),
+    border-color 0.28s var(--ease),
+    box-shadow   0.28s var(--ease);
+}
+
+.navbar__cta:hover {
+  color: var(--white);
+  border-color: var(--coral);
+  box-shadow: 0 0 0 1px var(--coral),
+              inset 0 0 20px rgba(255, 107, 91, 0.06);
+}
+
+.navbar__cta-arrow {
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+  transform: translateX(0);
+  transition:
+    transform 0.28s var(--ease),
+    opacity   0.28s var(--ease);
+}
+
+.navbar__cta:hover .navbar__cta-arrow {
+  transform: translateX(5px);
+  opacity: 1;
+}
+
+/* ─── Divider between label and arrow ───────────── */
+.navbar__cta::before {
+  content: '';
+  position: absolute;
+  right: 38px;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background: rgba(255, 107, 91, 0.3);
+  transition: background 0.28s var(--ease);
+}
+.navbar__cta:hover::before {
+  background: rgba(255, 107, 91, 0.6);
+}
+
+/* ─── Hamburger ─────────────────────────────────── */
+.navbar__hamburger {
   display: none;
   flex-direction: column;
-  gap: 2px;
-}
-
-.nav-item:hover .dropdown {
-  display: flex;
-  animation: dropIn 0.18s ease;
-}
-
-@keyframes dropIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.75rem;
-  border-radius: 7px;
-  text-decoration: none;
-  transition: background 0.15s ease;
-}
-
-.dropdown-item:hover {
-  background: #faf8f5;
-}
-
-.dropdown-icon {
-  font-size: 1.1rem;
-  width: 28px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.dropdown-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.dropdown-title {
-  font-size: 0.83rem;
-  font-weight: 500;
-  color: var(--ink);
-  letter-spacing: 0.02em;
-}
-
-.dropdown-desc {
-  font-size: 0.73rem;
-  color: var(--muted);
-}
-
-/* ─── Actions ─── */
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
-.btn-ghost {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.835rem;
-  font-weight: 400;
-  letter-spacing: 0.03em;
-  color: var(--ink);
-  text-decoration: none;
-  padding: 0.45rem 0.9rem;
-  border-radius: 6px;
-  transition: color 0.2s ease, background 0.2s ease;
-}
-
-.btn-ghost:hover {
-  color: var(--gold);
-  background: rgba(184, 147, 63, 0.06);
-}
-
-.btn-primary {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.835rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: #fff;
-  text-decoration: none;
-  background: var(--ink);
-  padding: 0.5rem 1.1rem;
-  border-radius: 6px;
-  border: 1px solid var(--ink);
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.btn-primary:hover {
-  background: var(--gold);
-  border-color: var(--gold);
-}
-
-.btn-primary svg {
-  transition: transform 0.2s ease;
-}
-
-.btn-primary:hover svg {
-  transform: translateX(3px);
-}
-
-/* ─── Hamburger ─── */
-.hamburger {
-  display: none;
-  flex-direction: column;
+  justify-content: center;
   gap: 5px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 6px;
-  margin-left: auto;
+  padding: 8px;
+  z-index: 1100;
+  flex-shrink: 0;
 }
 
-.hamburger span {
+.navbar__bar {
   display: block;
-  height: 1.5px;
   width: 24px;
-  background: var(--ink);
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  height: 1.5px;
+  background: var(--white);
+  border-radius: 2px;
+  transition: transform 0.35s var(--ease), opacity 0.25s, width 0.3s;
   transform-origin: center;
 }
 
-.hamburger.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-.hamburger.active span:nth-child(2) { opacity: 0; }
-.hamburger.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+.navbar__bar--top-open { transform: translateY(6.5px) rotate(45deg); }
+.navbar__bar--mid-open { opacity: 0; transform: scaleX(0); }
+.navbar__bar--bot-open { transform: translateY(-6.5px) rotate(-45deg); }
 
-/* ─── Mobile Menu ─── */
-.mobile-menu {
+/* ─── Mobile Menu ───────────────────────────────── */
+.navbar__mobile-menu {
+  position: fixed;
+  inset: 0;
+  background: var(--grey-900);
   display: flex;
   flex-direction: column;
-  padding: 1rem 1.5rem 1.5rem;
-  border-top: 1px solid var(--border);
-  background: var(--glass);
-  backdrop-filter: blur(18px);
-}
-
-.mobile-link {
-  font-size: 0.9rem;
-  font-weight: 400;
-  color: var(--ink);
-  text-decoration: none;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid rgba(184, 147, 63, 0.1);
-  letter-spacing: 0.03em;
-  transition: color 0.2s ease;
-}
-
-.mobile-link:hover { color: var(--gold); }
-.mobile-link.subtle { color: var(--muted); }
-
-.mobile-divider {
-  height: 1rem;
-}
-
-.mobile-cta {
-  margin-top: 0.75rem;
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  background: var(--ink);
-  color: #fff;
+  align-items: flex-start;
+  padding: 80px 48px 48px;
+  z-index: 1050;
+  overflow: hidden;
+}
+
+.navbar__mobile-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.navbar__mobile-item {
+  animation: mobileLinkIn 0.45s var(--delay, 0.1s) var(--ease) both;
+  overflow: hidden;
+}
+
+.navbar__mobile-link {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
   text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  padding: 0.8rem 1.5rem;
-  border-radius: 7px;
-  transition: background 0.2s ease;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 6vw, 3.5rem);
+  font-weight: 700;
+  color: var(--white);
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: color 0.25s, padding-left 0.3s var(--ease);
 }
 
-.mobile-cta:hover { background: var(--gold); }
-
-/* ─── Transitions ─── */
-.mobile-slide-enter-active,
-.mobile-slide-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
+.navbar__mobile-link:hover {
+  color: var(--coral);
+  padding-left: 12px;
 }
-.mobile-slide-enter-from,
-.mobile-slide-leave-to {
+
+.navbar__mobile-num {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--coral);
+  opacity: 0.8;
+  min-width: 24px;
+}
+
+.navbar__mobile-cta {
+  margin-top: 40px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--coral);
+  text-decoration: none;
+  padding: 14px 28px;
+  border: 1.5px solid var(--coral);
+  display: inline-block;
+  transition: background 0.3s, color 0.3s;
+  animation: mobileLinkIn 0.45s 0.55s var(--ease) both;
+}
+
+.navbar__mobile-cta:hover {
+  background: var(--coral);
+  color: var(--white);
+}
+
+.navbar__mobile-deco {
+  position: absolute;
+  right: -80px; bottom: -80px;
+  width: 320px; height: 320px;
+  border: 1px solid rgba(255, 107, 91, 0.12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.navbar__mobile-deco::before {
+  content: '';
+  position: absolute;
+  inset: 40px;
+  border: 1px solid rgba(255, 107, 91, 0.08);
+  border-radius: 50%;
+}
+
+/* ─── Vue Transitions ───────────────────────────── */
+.mobile-menu-enter-active {
+  transition: clip-path 0.55s var(--ease), opacity 0.35s;
+  clip-path: circle(0% at calc(100% - 52px) 38px);
+}
+.mobile-menu-enter-to {
+  clip-path: circle(150% at calc(100% - 52px) 38px);
+  opacity: 1;
+}
+.mobile-menu-leave-active {
+  transition: clip-path 0.5s var(--ease), opacity 0.3s 0.1s;
+}
+.mobile-menu-leave-to {
+  clip-path: circle(0% at calc(100% - 52px) 38px);
   opacity: 0;
-  transform: translateY(-8px);
 }
 
-/* ─── Responsive ─── */
+/* ─── Keyframes ─────────────────────────────────── */
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes mobileLinkIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Responsive ────────────────────────────────── */
 @media (max-width: 900px) {
-  .nav-links, .nav-actions { display: none; }
-  .hamburger { display: flex; }
-  .navbar-inner { gap: 1rem; }
+  .navbar__links,
+  .navbar__actions { display: none; }
+  .navbar__hamburger { display: flex; }
+  .navbar__inner { padding: 0 24px; }
 }
 </style>
