@@ -43,7 +43,7 @@
 
         <!-- Office locations -->
         <div class="contact__offices">
-          <span class="contact__offices-label">Our Offices</span>
+          <span class="contact__offices-label">Our Office</span>
           <div class="contact__offices-list">
             <div v-for="office in offices" :key="office.city" class="contact__office">
               <span class="contact__office-dot"></span>
@@ -239,24 +239,24 @@ export default {
       details: [
         {
           label: 'Email Us',
-          value: 'advisory@harderlin.com',
-          href: 'mailto:advisory@harderlin.com',
+          value: 'hrmofficial@outlook.com',
+          href: 'mailto:hrmofficial@outlook.com',
           icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                    <rect x="2" y="4" width="16" height="12" rx="2" stroke="#FF6B5B" stroke-width="1.4"/>
                    <path d="M2 7l8 5 8-5" stroke="#FF6B5B" stroke-width="1.4" stroke-linecap="round"/>
                  </svg>`,
         },
         {
-          label: 'Call Us',
-          value: '+1 (212) 555-0192',
-          href: 'tel:+12125550192',
+          label: 'Whatsapp Us',
+          value: '+49 (163) 491-6797',
+          href: 'tel:+491634916797',
           icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                    <path d="M4 3h3.5l1.5 4-2 1.5c1 2 2.5 3.5 4.5 4.5L13 11l4 1.5V16a1 1 0 01-1 1C6 17 3 8 3 4a1 1 0 011-1z" stroke="#FF6B5B" stroke-width="1.4" stroke-linejoin="round"/>
                  </svg>`,
         },
         {
           label: 'Headquarters',
-          value: '1 World Trade Center, New York',
+          value: '81 Blankenburger strabe, Berlin',
           href: '#',
           icon: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                    <path d="M10 2C7.2 2 5 4.2 5 7c0 4 5 11 5 11s5-7 5-11c0-2.8-2.2-5-5-5z" stroke="#FF6B5B" stroke-width="1.4"/>
@@ -265,9 +265,7 @@ export default {
         },
       ],
       offices: [
-        { city: 'New York',  address: '1 World Trade Center, Suite 8500' },
-        { city: 'London',    address: '30 St Mary Axe, EC3A 8BF' },
-        { city: 'Singapore', address: '1 Raffles Place, Tower 1' },
+        { city: 'Berlin',  address: '81 Blankenburger strabe, Berlin' },
       ],
     };
   },
@@ -465,7 +463,9 @@ export default {
 .contact__detail-value:hover { color: var(--coral); }
 
 /* Offices */
-.contact__offices { }
+.contact__offices { 
+  
+}
 
 .contact__offices-label {
   display: block;
