@@ -6,6 +6,8 @@ import AboutSection from './components/AboutSection.vue';
 import InsightsSection from './components/InsightsSection.vue';
 import ContactSection from './components/ContactSection.vue';
 import Footer from './components/Footer.vue';
+import whatsappfloat from './components/whatsappfloat.vue';
+
 </script>
 
 <template>
@@ -17,5 +19,6 @@ import Footer from './components/Footer.vue';
     <InsightsSection />
     <ContactSection />
     <Footer />
+    <whatsappfloat />
   </div>
 </template>
